@@ -4,21 +4,254 @@
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Page Title</title>
+    <title>Form Builder</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
 </head>
 
 <body>
     <div class="header">
-        <h1> Vanilla JS Template</h1>
+        <h1>Form Builder Consumer Application</h1>
     </div>
-
-    <div class="appRoot" id="root">
-        
-    </div>
+    <fieldset class="fieldsetRoot">
+        <legend class="fieldsetLegend">Form Builder</legend>
+        <label class="fieldsetLabel">Below fields are dynamically generated based on JSON meta-data
+            <button onclick="showFormMetaData()" class="metadataToggleButton">FORM Data</button>
+        </label>
+        <!-- Below is the custom form builder consumed by this application -->
+        <form-builder title="Build your form">
+            <template>
+                <!-- style passed here can be applied to form-builder components -->
+                <style>
+                    .nameInput{
+                        padding: 10px; 
+                        color: green; 
+                        width: 50%
+                    }
+                    .nameInputBg {
+                        background-color: wheat;
+                    }
+                </style>
+            </template>
+        </form-builder>
+        <!-- Custom Form builder implementation ends here -->
+    </fieldset>
+    
+    <button onclick="handleFormSubmit()" class="showStateButton">Alert Form State</button>
 
     <link rel='stylesheet' type='text/css' media='screen' href='styles/index.css'>
-    <script src='scripts/index.js'></script>
+    <script src='scripts/index.js' ></script>
+    <script>
+        /*
+            customValidation function is used as a callback to validate individual fields. It is part of the meta-data
+            and can be called via 'validation' prop of meta-data object
+        */
+        const customValidation = (e,item) => {
+            /*
+                e.target.value: current value of the field
+                item: properties of field same as that passed in meta-data object
+            */
+            console.log('$$ validation: ', item)
+        }
+             
+        
+        /*
+            genericFieldValidator function is used as a callback to validate all the fields individually. It can be called on to the
+            formBuilder component like- formbuilder.genericFieldValidator
+        */
+        const genericFieldValidator = (e, item) => {
+             /*
+                e.target.value: current value of the field
+                item: properties of field same as that passed in meta-data object
+            */
+            if(item.required && typeof e.target.value === 'string' && !e.target.value.trim().length){
+                return {[`${item.id}-error`]: `${item.id} can not be empty`}
+            }
+        }
+
+        /*
+            handleFormSubmit function can be attached to custom button element(not part of form-builder component). Here, it is used
+            to access the state of the formbuilder like - formBuilder.state
+        */
+        const handleFormSubmit = () => {
+            let formBuilder = document.querySelector('form-builder')
+            alert('Form state:\n'+JSON.stringify(formBuilder.state,null,'\t'))
+        }
+
+        let formBuilder = document.querySelector('form-builder')
+        formBuilder.genericFieldValidator = genericFieldValidator
+
+        formBuilder.metaData = [
+            {
+                id: 'name',
+                label: 'Name',
+                HTMLNode: 'input',
+                type: 'text',
+                placeholder: 'Enter Name',
+                // validation: customValidation,
+                style: `padding: 10px; color: green; width: 50%`,
+                required: true
+            },
+            {
+                id: 'dob',
+                label: 'Date of Birth',
+                HTMLNode: 'input',
+                type: 'date',
+                placeholder: 'Input date',
+                style: `padding: 10px; color: green; width: 50%`,
+                // validation: customValidation
+                required: true
+            },
+            {
+                id: 'password',
+                label: 'Password',
+                HTMLNode: 'input',
+                type: 'password',
+                placeholder: 'Enter Password',
+                style: `padding: 10px; color: green; width: 50%`,
+                required: true
+                // validation: customValidation
+            },
+            {
+                id: 'address',
+                label: 'Address',
+                HTMLNode: 'textarea',
+                type: 'text',
+                placeholder: 'Enter Address',
+                style: `padding: 10px; color: green;`,
+                HTMLNodeAttributes: {
+                    rows: '4',
+                    cols: '77'
+                },
+                required: true
+                // validation: customValidation
+            },
+            {
+                id: 'file',
+                label: 'Upload File',
+                HTMLNode: 'input',
+                type: 'file',
+                placeholder: 'Upload File',
+                style: `padding: 10px; color: green; width: 50%;`,
+                required: true
+                // validation: customValidation
+            },
+            {
+                id: 'language',
+                label: 'Language',
+                HTMLNode: 'input',
+                type: 'checkbox',
+                // validation: customValidation,
+                style: `padding: 10px; color: green; width: 50%;display: flex;`,
+                options: [
+                    {
+                        id: 'hindi',
+                        label: 'Hindi',
+                        style: 'padding: 10px; margin: 5px'
+                    },
+                    {
+                        id: 'english',
+                        label: 'English',
+                        style: 'padding: 10px; margin: 5px'
+                    },
+                    {
+                        id: 'tamil',
+                        label: 'Tamil',
+                        style: 'padding: 10px; margin: 5px'
+                    }
+                ]
+                // required: true
+            },
+            {
+                id: 'gender',
+                label: 'Gender',
+                HTMLNode: 'input',
+                type: 'radio',
+                // validation: customValidation,
+                style: `padding: 10px; color: green; width: 50%;display: flex;`,
+                options: [
+                    {
+                        id: 'male',
+                        label: 'Male',
+                        style: 'margin: 5px'
+                    },
+                    {
+                        id: 'female',
+                        label: 'Female',
+                        style: 'margin: 5px'
+                    },
+                    {
+                        id: 'other',
+                        label: 'Other',
+                        style: 'margin: 5px'
+                    }
+                ]
+                // required: true
+            },
+            {
+                id: 'car',
+                label: 'Select Car',
+                HTMLNode: 'select',
+                style: `padding: 10px; color: green; width: 50%;display: flex;`,
+                options: [
+                    {
+                        id: '',
+                        label: 'Select One',
+                        style: 'margin: 5px'
+                    },
+                    {
+                        id: 'tata-indica',
+                        label: 'Tata Indica',
+                        style: 'margin: 5px'
+                    },
+                    {
+                        id: 'mahindra-scorpio',
+                        label: 'Mahindra Scorpio',
+                        style: 'margin: 5px'
+                    },
+                    {
+                        id: 'maruti-wagonr',
+                        label: 'Maruti WagonR',
+                        style: 'margin: 5px'
+                    }
+                ]
+                // required: true
+            },
+        ]
+        
+        // ----- Below functions are composing application helper functions -----
+        /*
+            showFormMetaData is a composing component function implemented for demostration of formBuilder properties viz. formBuilder._state, 
+            formBuilder._metaData etc.
+        */
+        const showFormMetaData = () =>{
+            let metaDataRoot = document.createElement('div');
+            metaDataRoot.id = 'metadata-root'
+            metaDataRoot.className = 'metadata'
+
+            let metaDataDiv = document.createElement('div');
+            metaDataDiv.id = 'metadata-json';
+            
+            metaDataDiv.innerHTML = `<div style="position: sticky;top:-10px; background-color: white; padding:10px">$$ Form Object</div><br/><span>${JSON.stringify(formBuilder,null,'\t')}</span>`
+            // alert('$$ Form MetaData \n'+JSON.stringify(formBuilder.metaData,null,'\t'))
+            metaDataRoot.appendChild(metaDataDiv)
+
+            let metaDataClose = document.createElement('div');
+            metaDataClose.id = 'metadata-json-close';
+            metaDataClose.className = 'metadataClose';
+            let closeButton = document.createElement('button');
+            closeButton.id = 'metadata-json-close-button';
+            closeButton.className = 'metadataToggleButton';
+            closeButton.innerHTML = 'Close'
+            closeButton.addEventListener('click',()=>{
+                let metaDataRoot = document.querySelector('#metadata-root')
+                metaDataRoot.parentNode.removeChild(metaDataRoot);
+            })
+            metaDataClose.appendChild(closeButton)
+            metaDataRoot.appendChild(metaDataClose)
+
+            document.body.append(metaDataRoot)
+        }
+    </script>
 </body>
 
 </html>
